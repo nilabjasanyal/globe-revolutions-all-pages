@@ -1,0 +1,121 @@
+<html>
+<head>
+    <title>threejs - models</title>
+
+    <style>
+    	body{
+    		margin: 0;
+    		overflow: hidden;
+    	}
+    </style>
+</head>
+<body>
+
+    <canvas id="myCanvas"></canvas>
+
+    <script src="three.js"></script>
+    <script src="GLTFLoader.js"></script>
+<!-- ============================================================== -->
+
+
+    <script>
+
+    //RENDERER
+    renderer = new THREE.WebGLRenderer({
+      canvas: myCanvas, 
+      antialias: true
+    });
+
+    renderer.setClearColor(0x000000);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    //CAMERA
+    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+    //SCENE
+    scene = new THREE.Scene();
+
+    //LIGHTS
+    var light = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(light);
+
+    var light2 = new THREE.PointLight(0xffffff, 0.5);
+    scene.add(light2);
+    let z,x,xx,zz,t,PATH
+
+    function create_globe(PATH, z,x,xx,zz,y){
+        var loader = new THREE.GLTFLoader();
+        var mesh;
+         loader.load(PATH, function(gltf){
+            console.log(gltf);
+            mesh = gltf.scene;
+            console.log(mesh.children[0]);
+            mesh.children[0].material = new THREE.MeshLambertMaterial();
+            
+            mesh.position.z = z;
+            mesh.position.x = x
+            if(x!=0 && y!=0){
+                gltf.scene.scale.set(0.5,0.5,0.5)
+            }
+            if(y!=0){
+                
+                gltf.scene.scale.set(0.1,0.1,0.1)
+            }
+            if(y==1){
+                mesh.position.y = x
+                    }
+            if(y==2){
+                mesh.position.y = -1*x
+            }
+            scene.add( mesh );
+            
+        });
+        
+
+        //RENDER LOOP
+        render();
+        let t=0,v=0
+        function render() {
+
+            if (mesh) {
+                
+                
+                    mesh.rotateOnAxis(new THREE.Vector3(1,0,0), 0.01);
+                    
+                    if(x!=0 && y!=0){
+                        t+=0.06
+                       
+                        
+                        mesh.position.x += 0.1*Math.sin(t);
+                        console.log(mesh.position.x)
+                        mesh.position.z += 0.1*Math.cos(t);
+                        if(y==1){
+                            mesh.position.y += 0.1*Math.sin(t);
+                        }
+                        if(y==2){
+                            mesh.position.y += -0.1*Math.sin(t);
+                        }
+                        
+                    }
+
+            }
+            
+            renderer.render(scene, camera);
+
+            requestAnimationFrame(render);
+    }}
+    
+    create_globe('globe.glb',-10,0,0,0,0)
+    create_globe('globe.glb',-10,-5,0,0,0)
+    create_globe('globe.glb',-10,5,0,0,0)
+    // create_globe(-10,-2.49987703016,-0.5,-0.5,0)
+    create_globe('satellite.glb',-10,-1.66622609329,-0.5,-0.5,1)
+    create_globe('satellite.glb',-10,-1.66622609329,-0.5,-0.5,2)
+
+    </script>
+
+
+    <!-- =============================================================== -->
+</body>
+</html>
